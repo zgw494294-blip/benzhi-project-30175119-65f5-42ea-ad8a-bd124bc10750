@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>方言语料授权发布工作台</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+  <header><div><p class="eyebrow">地方语言档案 · 单案工作流</p><h1>方言语料授权发布工作台</h1></div><div id="case-badge" class="badge">尚未建案</div></header>
+  <main>
+    <nav id="steps" aria-label="案件进度"></nav>
+    <section id="notice" class="notice" hidden></section>
+    <section class="panel" id="create-panel">
+      <div class="panel-title"><span>01</span><div><h2>建立捐赠案</h2><p>登记贡献者与采集背景，所有后续动作都会留下版本与审计记录。</p></div></div>
+      <form id="create-form" class="grid two">
+        <label>贡献者代号<input name="contributorCode" required value="CONTRIB-01"></label>
+        <label>语种标签（逗号分隔）<input name="languageTags" required value="吴语,地方口述"></label>
+        <label class="wide">采集背景<textarea name="collectionContext" required>社区口述史访谈，经贡献者主动捐赠。</textarea></label>
+        <label class="wide">预期公开范围<input name="intendedAudience" required value="经审核后面向研究者及公众展示"></label>
+        <button type="submit">创建案件</button>
+      </form>
+    </section>
+    <section class="panel gated" id="segment-panel">
+      <div class="panel-title"><span>02</span><div><h2>语料片段</h2><p>片段按顺序独立授权、扫描和处置。</p></div></div>
+      <details><summary>维护案件登记信息</summary>
+        <form id="metadata-form" class="grid two inset">
+          <label>贡献者代号<input name="contributorCode" required></label><label>语种标签（逗号分隔）<input name="languageTags" required></label>
+          <label class="wide">采集背景<textarea name="collectionContext" required></textarea></label><label class="wide">预期公开范围<input name="intendedAudience" required></label>
+          <button type="submit">保存案件信息</button>
+        </form>
+      </details>
+      <form id="segment-form" class="grid three">
+        <input name="segmentId" type="hidden">
+        <label>顺序号<input name="sequence" type="number" min="1" required value="1"></label><label>说话者代号<input name="speakerCode" required value="SPK-A"></label><label>内容类别<input name="category" required value="叙事"></label>
+        <label>开始毫秒<input name="startMillis" type="number" min="0" required value="0"></label><label>结束毫秒<input name="endMillis" type="number" min="1" required value="4200"></label>
+        <label class="wide">文字转写<textarea name="transcript" required placeholder="例如：姓名：张三，住在河西村12号，电话13800138000。">姓名：张三，住在河西村12号，电话13800138000。</textarea></label>
+        <button type="submit" id="save-segment">加入片段</button><button type="button" id="cancel-edit" class="ghost" hidden>取消编辑</button><button type="button" id="request-consent" class="secondary">提交贡献者同意</button>
+      </form>
+      <details id="batch-segment-box"><summary>批量录入连续片段</summary>
+        <form id="batch-segment-form" class="inset"><div id="batch-segment-rows" class="batch-rows"></div><div class="actions"><button type="button" id="add-batch-row" class="ghost">增加一行</button><button type="submit">原子保存整批片段</button></div></form>
+      </details>
+      <div class="actions"><button id="revoke-segments" type="button" class="danger">撤销勾选片段</button></div><div id="segments" class="cards"></div>
+    </section>
+    <section class="panel gated" id="consent-panel">
+      <div class="panel-title"><span>03</span><div><h2>知情同意清单</h2><p>确认会冻结当前片段范围；公开发布必须取得公开展示许可。</p></div></div>
+      <div id="consent-scope" class="cards"></div><p>范围摘要 <code id="scope-digest">等待生成</code></p>
+      <form id="consent-form"><input type="hidden" name="scopeDigest"><div class="checks"><label><input type="checkbox" name="researchAllowed" checked> 研究用途</label><label><input type="checkbox" name="teachingAllowed" checked> 教学用途</label><label><input type="checkbox" name="publicDisplayAllowed" checked> 公开展示</label></div><div id="purpose-impact" class="impact"></div><label>确认人<input name="confirmedBy" required value="CONTRIB-01"></label><button type="submit">确认同意基线</button></form><pre id="consent-receipt" hidden></pre>
+    </section>
+    <section class="panel gated" id="finding-panel">
+      <div class="panel-title"><span>04</span><div><h2>敏感信息处置台</h2><p>本地规则识别人名、精确地点、联系方式和第三方叙述；逐项填写处置理由。</p></div></div>
+      <div class="actions"><button id="scan">执行或复跑本地扫描</button><button id="preview" class="ghost">查看可发布预览</button></div><div id="scan-summary" class="impact">尚无扫描记录</div>
+      <div class="batch-toolbar"><label>统一处置<select id="bulk-disposition"><option value="mask">遮蔽</option><option value="generalize">泛化</option><option value="keep">保留</option><option value="exclude">排除片段</option></select></label><label>统一理由<input id="bulk-rationale" value="批量核对后按敏感信息最小化原则处理"></label><button id="apply-bulk" type="button">应用并保存勾选项</button><button id="save-selected" type="button" class="secondary">按各项选择保存勾选项</button></div>
+      <div id="findings" class="cards"></div><section id="revision-tasks"></section><pre id="publication-preview">尚未生成预览</pre><button id="submit-review" class="secondary">提交伦理复核</button>
+    </section>
+    <section class="panel gated" id="review-panel">
+      <div class="panel-title"><span>05</span><div><h2>伦理复核</h2><p>可按敏感项定向退回；整改后只能修改被退回项。</p></div></div>
+      <form id="review-form" class="grid two"><label>复核员代号<input name="reviewerCode" required value="ETHICS-01"></label><label>结论<select name="decision"><option value="approved">批准并冻结</option><option value="returned">退回整改</option></select></label><label class="wide">复核意见<textarea name="comments">同意范围与处置结果符合发布要求。</textarea></label><label class="wide">退回敏感项 ID（逗号分隔）<input name="targetFindingIds" placeholder="仅退回时必填"></label><button type="submit">提交复核结论</button></form><div id="reviews" class="cards"></div>
+    </section>
+    <section class="panel gated" id="release-panel">
+      <div class="panel-title"><span>06</span><div><h2>冻结发布与独立校验</h2><p>凭据绑定案件版本、公开清单、同意摘要和批准信息，只能签发一次。</p></div></div>
+      <div class="actions"><button id="release">签发发布凭据</button><button id="verify" class="secondary">重新校验凭据</button><button id="timeline" class="ghost">查看审计时间线</button></div><pre id="credential">等待签发</pre><div id="audit" class="timeline"></div>
+      <details><summary>粘贴凭据进行只读独立校验</summary><label>完整凭据对象<textarea id="credential-input" class="credential-input" placeholder="粘贴 JSON 凭据对象"></textarea></label><div class="actions"><button id="use-current-credential" type="button" class="ghost">使用当前凭据</button><button id="verify-presented" type="button">独立校验</button></div><div id="verification-result"></div></details>
+    </section>
+  </main>
+  <footer>数据与扫描均保留在本机 SQLite 数据库中 · 无外部网络依赖</footer>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
